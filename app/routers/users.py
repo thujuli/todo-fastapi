@@ -1,3 +1,4 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from .. import schemas, db, models, security
@@ -16,7 +17,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(db.get_db)):
     if query.first():
         raise HTTPException(
             status.HTTP_409_CONFLICT,
-            "E-mail address already in use.",
+            "E-mail address already in use",
         )
 
     # hashing user password
@@ -33,7 +34,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(db.get_db)):
     return new_user
 
 
-@router.get("/{user_id}", response_model=schemas.UserOut)
-def get_user(user_id: int, db: Session = Depends(db.get_db)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+@router.get("/", response_model=schemas.UserOut)
+def get_current_user(
+    db: Session = Depends(db.get_db),
+    current_user: schemas.UserOut = Depends(security.get_current_user),
+):
+    user = db.query(models.User).filter(models.User.id == current_user.id).first()
+
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
+
     return user
