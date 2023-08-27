@@ -1,5 +1,4 @@
-from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -7,10 +6,8 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8)
 
 
 class UserOut(UserBase):
     id: int
-    create_at: datetime
-    update_at: datetime | None
