@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from .config import settings
+from sqlalchemy.orm import sessionmaker
+from app.core.config import settings
 
 DB_URL = (
     "postgresql://"
@@ -18,16 +18,3 @@ DB_URL = (
 engine = create_engine(DB_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-class Base(DeclarativeBase):
-    pass
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

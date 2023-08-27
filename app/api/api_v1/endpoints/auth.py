@@ -2,23 +2,25 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from .. import schemas, db, models, security
+from app import schemas, models
+from app.api.deps import get_db
+from app.core.security import verify_password, create_access_token
 
-router = APIRouter(prefix="", tags=["authentication"])
+router = APIRouter()
 
 
 @router.post("/login", response_model=schemas.Token)
 def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(db.get_db),
+    db: Session = Depends(get_db),
 ):
     user = db.query(models.User).filter(models.User.email == form_data.username).first()
-    if user is None or not security.verify_password(form_data.password, user.password):
+    if user is None or not verify_password(form_data.password, user.password):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Incorrect Email or Password",
             {"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = security.create_access_token({"user_id": user.id})
+    access_token = create_access_token({"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
