@@ -1,20 +1,26 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.sql import func
+from typing import List, Optional
+from datetime import datetime
 from app.db.base_class import Base
 
 
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
-    description = Column(String)
-    is_done = Column(Boolean, server_default="false")
-    project_id = Column(
-        Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    description: Mapped[Optional[str]]
+    is_done: Mapped[bool] = mapped_column(server_default="false")
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE")
     )
-    create_at = Column(DateTime(True), server_default=func.now())
-    update_at = Column(DateTime(True), onupdate=func.now())
+    created: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), onupdate=func.now()
+    )
 
-    project = relationship("Project", back_populates="tasks")
+    projects: Mapped[List["Project"]] = relationship(back_populates="user")
