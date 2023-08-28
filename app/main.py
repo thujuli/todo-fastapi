@@ -8,7 +8,7 @@ from app.db.session import engine
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title=settings.project_name, openapi_url=f"{settings.api_v1_str}/openapi.json"
+    title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-app.include_router(api_router, prefix=settings.api_v1_str)
+app.include_router(api_router, prefix=settings.API_V1_STR)

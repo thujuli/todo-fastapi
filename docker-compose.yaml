@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  web-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-fastapi
+    restart: always
+    depends_on:
+      - todo-db
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 8000:8000
+    command: bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME}
+      - API_V1_STR=${API_V1_STR}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=todo-db
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_ACCESS_TOKEN_EXPIRE_MINUTES=${JWT_ACCESS_TOKEN_EXPIRE_MINUTES}
+
+  todo-db:
+    image: postgres:14.8
+    container_name: todo-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - 5433:5432
+    volumes:
+      - todo-data:/var/lib/postgresql/data
+
+volumes:
+  todo-data:
