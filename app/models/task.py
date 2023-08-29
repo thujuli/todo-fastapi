@@ -23,4 +23,4 @@ class Task(Base):
         DateTime(timezone=True), onupdate=func.now()
     )
 
-    projects: Mapped[List["Project"]] = relationship(back_populates="user")
+    project: Mapped["Project"] = relationship(back_populates="tasks")
