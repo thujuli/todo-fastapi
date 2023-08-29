@@ -2,7 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app import schemas, models
+from app import schemas
+from app.crud import crud_token
 from app.api.deps import get_db
 from app.core.security import verify_password, create_access_token
 
@@ -14,7 +15,7 @@ def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),
 ):
-    user = db.query(models.User).filter(models.User.email == form_data.username).first()
+    user = crud_token.get_user_email(db, form_data.username)
     if user is None or not verify_password(form_data.password, user.password):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,

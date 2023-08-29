@@ -8,7 +8,7 @@ from app.core.config import settings
 from app import schemas, models
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.API_V1_STR + "/auth/login")
 
 
 def get_db():
