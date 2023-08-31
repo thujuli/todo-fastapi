@@ -29,8 +29,13 @@ def get_user_projects(db: Session, user_id: int):
     return db.query(models.Project).filter(models.Project.user_id == user_id).all()
 
 
-def query_project(db: Session, project_id: int):
+def get_query_project(db: Session, project_id: int):
     return db.query(models.Project).filter(models.Project.id == project_id)
+
+
+def delete_query(db: Session, query: Query):
+    query.delete(synchronize_session=False)
+    db.commit()
 
 
 def update_query_project(db: Session, project: schemas.ProjectCreate, query: Query):

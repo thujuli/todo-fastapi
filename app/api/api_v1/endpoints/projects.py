@@ -41,7 +41,7 @@ def get_user_project(
     db: Session = Depends(deps.get_db),
     current_user: schemas.UserOut = Depends(deps.get_current_user),
 ):
-    query = crud_project.query_project(db, project_id)
+    query = crud_project.get_query_project(db, project_id)
     project = query.first()
     if project is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Project not found")
@@ -60,7 +60,7 @@ def delete_project(
     db: Session = Depends(deps.get_db),
     current_user: schemas.UserOut = Depends(deps.get_current_user),
 ):
-    query = crud_project.query_project(db, project_id)
+    query = crud_project.get_query_project(db, project_id)
     project = query.first()
     if project is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Project not found")
@@ -70,8 +70,7 @@ def delete_project(
             status.HTTP_403_FORBIDDEN, "User is not authorized to delete this project"
         )
 
-    query.delete(synchronize_session=False)
-    db.commit()
+    crud_project.delete_query(db, query)
 
 
 @router.put("/{project_id}", response_model=schemas.ProjectOut)
@@ -81,7 +80,7 @@ def update_project(
     db: Session = Depends(deps.get_db),
     current_user: schemas.UserOut = Depends(deps.get_current_user),
 ):
-    query = crud_project.query_project(db, project_id)
+    query = crud_project.get_query_project(db, project_id)
     project_found = query.first()
     if project_found is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Project not found")
